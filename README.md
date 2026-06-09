@@ -1,5 +1,5 @@
 
-![vbaXray logo](logo_chibipdf_small.png)
+![ChibiPDF logo](logo_chibipdf_small.png)
 # ChibiPDF
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
@@ -7,15 +7,25 @@
 ![VBA](https://img.shields.io/badge/VBA-7.0+-purple.svg)
 ![Dependencies](https://img.shields.io/badge/Dependencies-None-brightgreen.svg)
 
-A dependency-free PDF rendering and OCR library for VBA. No Adobe Acrobat. No Tesseract. No external DLLs.
+A dependency-free suite of PDF tools - including generation, rendering and OCR for VBA. No Adobe Acrobat. No Tesseract. No external DLLs.
+
+ChibiPDF comprises (at present) two key components:
+* ChibiEx - PDF text **ex**traction (OCR) and rendering (PDF>PNG **ex**porting)
+* ChibiScribe - PDF generation and document creation
+
+Currently, only ChibiEx is available. ChibiScribe will be uploaded soon.
+
+![ChibiEx logo](logo_chibiex_small.png)
+
+## Why ChibiEx?
+
+Most VBA OCR solutions require third-party software (Adobe Acrobat, Tesseract, GhostScript, etc.) that must be installed on the host machine. From personal experience, this is ordinarily a non-starter in locked-down corporate environments.
 
 ChibiEx allows VBA applications to:
 
 * Extract text from searchable and scanned PDFs using OCR
 * Render PDF pages to PNG image files, `StdPicture` objects, memory, or streams
 * OCR image files, HBITMAPs, `StdPicture`s, and in-memory streams
-
-Just a single class module and the Windows APIs already present on Windows 10 and later.
 
 ---
 
@@ -78,12 +88,6 @@ If ocr.RecogniseFile("C:\OCR\Scan.png") Then
 End If
 ```
 
-## Why ChibiEx?
-
-Most VBA OCR solutions require third-party software (Adobe Acrobat, Tesseract, GhostScript, etc.) that must be installed on the host machine. From personal experience, this is ordinarily a non-starter in locked-down corporate environments.
-
-ChibiEx uses native Windows WinRT APIs and ships as a single VBA class module.
-
 ## Requirements
 
 | Requirement      | Details                                                        |
@@ -92,19 +96,6 @@ ChibiEx uses native Windows WinRT APIs and ships as a single VBA class module.
 | VBA Host         | Excel, Word, Access, Outlook, PowerPoint, VB6-compatible hosts |
 | Architecture     | 32-bit and 64-bit                                              |
 | Dependencies     | None                                                           |
-
----
-
-## Roadmap
-
-ChibiEx is part of the (intended) wider ChibiPDF project.
-
-Planned components include:
-
-| Module      | Purpose                              |
-| ----------- | ------------------------------------ |
-| ChibiEx     | PDF extraction, rendering and OCR    |
-| ChibiScribe | PDF generation and document creation |
 
 ---
 
