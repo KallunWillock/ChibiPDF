@@ -13,7 +13,7 @@ Attribute VB_Exposed = False
 '  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 '
 '  AUTHOR:   Kallun Willock
-'            (Based on WinRT OCR + PDF work by Frank Schuler)
+'            (Based on WinRT OCR + PDF work by Frank Schüler)
 '
 '  URL:      https://github.com/KallunWillock/ChibiPDF
 '            https://www.activevb.de
