@@ -1,3 +1,5 @@
+
+![vbaXray logo](logo_chibipdf_small.png)
 # ChibiPDF
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
