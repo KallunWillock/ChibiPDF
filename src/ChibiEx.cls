@@ -77,8 +77,10 @@ Option Explicit
 
 #If Win64 Then
   Private Const PTR_SIZE As Long = 8
+  Private Const vbLongPtr As Long = vbLongLong
 #Else
   Private Const PTR_SIZE As Long = 4
+  Private Const vbLongPtr As Long = vbLong
 #End If
 
 Private Const S_OK                      As Long = 0
@@ -207,7 +209,6 @@ End Type
 #If VBA7 Then
   Private Declare PtrSafe Function CLSIDFromString Lib "ole32.dll" (ByVal pString As LongPtr, ByRef pClsid As GUID) As Long
   Private Declare PtrSafe Function DispCallFunc Lib "oleaut32.dll" (ByVal pvInstance As LongPtr, ByVal oVft As LongPtr, ByVal cc As Long, ByVal vtReturn As VbVarType, ByVal cActuals As Long, ByVal prgvt As Any, ByVal prgpvarg As Any, ByRef pvargResult As Variant) As Long
-  Private Declare PtrSafe Function lstrlenW Lib "kernel32.dll" (ByVal lpString As LongPtr) As Long
   Private Declare PtrSafe Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" (ByRef pTo As Any, ByRef uFrom As Any, ByVal lSize As LongPtr)
   Private Declare PtrSafe Function WindowsCreateString Lib "combase.dll" (ByVal sourceString As LongPtr, ByVal Length As Long, ByRef hString As LongPtr) As Long
   Private Declare PtrSafe Function WindowsDeleteString Lib "combase.dll" (ByVal hString As LongPtr) As Long
@@ -229,14 +230,13 @@ End Type
   End Enum
   Private Declare Function CLSIDFromString Lib "ole32.dll" (ByVal pString As Long, ByRef pClsid As GUID) As Long
   Private Declare Function DispCallFunc Lib "oleaut32.dll" (ByVal pvInstance As Long, ByVal oVft As Long, ByVal cc As Long, ByVal vtReturn As VbVarType, ByVal cActuals As Long, ByVal prgvt As Any, ByVal prgpvarg As Any, ByRef pvargResult As Variant) As Long
-  Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal lpString As Long) As Long
   Private Declare Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" (ByRef pTo As Any, ByRef uFrom As Any, ByVal lSize As Long)
-  Private Declare Function WindowsCreateString Lib "combase.dll" (ByVal sourceString As Long, ByVal Length As Long, ByRef hstring As Long) As Long
-  Private Declare Function WindowsDeleteString Lib "combase.dll" (ByVal hstring As Long) As Long
-  Private Declare Function WindowsGetStringRawBuffer Lib "combase.dll" (ByVal hstring As Long, ByRef Length As Long) As Long
+  Private Declare Function WindowsCreateString Lib "combase.dll" (ByVal sourceString As Long, ByVal Length As Long, ByRef hString As Long) As Long
+  Private Declare Function WindowsDeleteString Lib "combase.dll" (ByVal hString As Long) As Long
+  Private Declare Function WindowsGetStringRawBuffer Lib "combase.dll" (ByVal hString As Long, ByRef Length As Long) As Long
   Private Declare Function RoGetActivationFactory Lib "combase.dll" (ByVal activatableClassId As Long, ByRef riid As GUID, ByRef factory As Long) As Long
   Private Declare Function SHCreateMemStream Lib "shlwapi.dll" (ByVal pInit As Long, ByVal cbInit As Long) As Long
-  Private Declare Function CreateRandomAccessStreamOnFile Lib "shcore.dll" (ByVal filePath As Long, ByVal accessMode As Long, ByRef riid As GUID, ByRef ppv As Long) As Long
+  Private Declare Function CreateRandomAccessStreamOnFile Lib "shcore.dll" (ByVal FilePath As Long, ByVal accessMode As Long, ByRef riid As GUID, ByRef ppv As Long) As Long
   Private Declare Function CreateRandomAccessStreamOverStream Lib "shcore.dll" (ByVal pStream As Long, ByVal options As Long, ByRef riid As GUID, ByRef ppv As Long) As Long
   Private Declare Function GdipCreateBitmapFromHBITMAP Lib "gdiplus.dll" (ByVal hbm As Long, ByVal hPal As Long, ByRef bitmap As Long) As Long
   Private Declare Function GdipDisposeImage Lib "gdiplus.dll" (ByVal image As Long) As Long
@@ -362,14 +362,6 @@ Public Property Get ResultLineWord(ByVal lineIndex As Long, ByVal wordIndex As L
   End With
 End Property
 
-Private Property Get ResultLineWordRect(ByVal lineIndex As Long, ByVal wordIndex As Long) As RECTF
-  If lineIndex >= 0 And lineIndex < m_Results.LineCount Then
-    If wordIndex >= 0 And wordIndex < m_Results.Lines(lineIndex).WordCount Then
-      ResultLineWordRect = m_Results.Lines(lineIndex).Words(wordIndex).Rect
-    End If
-  End If
-End Property
-
 Public Property Get Version() As Single
   Version = CHIBEX_VERSION
 End Property
@@ -489,7 +481,11 @@ End Function
 '  NB: caller must CloseStream.
 ' =======================================================
 
+#If Win64 Then
 Public Function ToStream(ByVal pageNum As Long) As LongPtr
+#Else
+Public Function ToStream(ByVal pageNum As Long) As Long
+#End If
   m_LastError = vbNullString
   If m_pDoc = 0 Then m_LastError = "No document loaded.": Exit Function
   If pageNum < 1 Or pageNum > m_PageCount Then m_LastError = "Page out of range.": Exit Function
@@ -500,7 +496,11 @@ End Function
 '  CloseStream: Public method to clean up streams
 ' ================================================
 
+#If Win64 Then
 Public Sub CloseStream(ByVal pStream As LongPtr)
+#Else
+Public Sub CloseStream(ByVal pStream As Long)
+#End If
   If pStream = 0 Then Exit Sub
   Dim iid As GUID, pClosable As LongPtr
   GuidFromString IID_IClosable, iid
@@ -635,7 +635,11 @@ Public Function RecogniseFile(ByVal FilePath As String) As Boolean
   CloseStream pStream
 End Function
 
+#If Win64 Then
 Public Function RecogniseBitmap(ByVal hBitmap As LongPtr) As Boolean
+#Else
+Public Function RecogniseBitmap(ByVal hBitmap As Long) As Boolean
+#End If
   m_LastError = vbNullString
   If Not GuardReady() Then Exit Function
   If hBitmap = 0 Then m_LastError = "HBITMAP handle is null.": Exit Function
@@ -673,7 +677,11 @@ Public Function RecogniseBitmap(ByVal hBitmap As LongPtr) As Boolean
   ReleaseInterface pIStream
 End Function
 
+#If Win64 Then
 Public Function RecogniseStream(ByVal pRandomAccessStream As LongPtr) As Boolean
+#Else
+Public Function RecogniseStream(ByVal pRandomAccessStream As Long) As Boolean
+#End If
   m_LastError = vbNullString
   If Not GuardReady() Then Exit Function
   If pRandomAccessStream = 0 Then
@@ -1139,7 +1147,7 @@ Private Sub IStreamSeek(ByVal pStream As LongPtr, ByVal Offset As Long, ByVal Or
   offsetCY = CCur(Offset) / 10000
   types(0) = vbCurrency: vars(0) = offsetCY: ptrs(0) = VarPtr(vars(0))
   types(1) = vbLong: vars(1) = CLng(Origin): ptrs(1) = VarPtr(vars(1))
-  types(2) = vbLongLong: vars(2) = VarPtr(posOut): ptrs(2) = VarPtr(vars(2))
+  types(2) = vbLongPtr: vars(2) = VarPtr(posOut): ptrs(2) = VarPtr(vars(2))
   If DispCallFunc(pStream, ISTREAM_SLOT_SEEK * PTR_SIZE, CC_STDCALL, vbLong, 3, VarPtr(types(0)), VarPtr(ptrs(0)), result) = S_OK Then
     newPos = posOut * 10000
   End If
@@ -1147,9 +1155,9 @@ End Sub
 
 Private Function IStreamRead(ByVal pStream As LongPtr, ByRef buffer As Byte, ByVal cbRequest As Long, ByRef bytesRead As Long) As Boolean
   Dim result As Variant, types(2) As Integer, ptrs(2) As LongPtr, vars(2) As Variant
-  types(0) = vbLongLong: vars(0) = VarPtr(buffer): ptrs(0) = VarPtr(vars(0))
+  types(0) = vbLongPtr: vars(0) = VarPtr(buffer): ptrs(0) = VarPtr(vars(0))
   types(1) = vbLong: vars(1) = cbRequest: ptrs(1) = VarPtr(vars(1))
-  types(2) = vbLongLong: vars(2) = VarPtr(bytesRead): ptrs(2) = VarPtr(vars(2))
+  types(2) = vbLongPtr: vars(2) = VarPtr(bytesRead): ptrs(2) = VarPtr(vars(2))
   IStreamRead = (DispCallFunc(pStream, ISTREAM_SLOT_READ * PTR_SIZE, CC_STDCALL, vbLong, 3, VarPtr(types(0)), VarPtr(ptrs(0)), result) = S_OK)
 End Function
 
