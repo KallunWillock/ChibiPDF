@@ -9,11 +9,11 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 
 '  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-'  |||||||||||||||||||||||||||   ChibiEx (v1.1)   ||||||||||||||||||||||||||||||||
+'  |||||||||||||||||||||||||||   ChibiEx (v1.2)   ||||||||||||||||||||||||||||||||
 '  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 '
 '  AUTHOR:   Kallun Willock
-'            (Based on WinRT OCR + PDF work by Frank Schüler)
+'            (Based on WinRT OCR + PDF work by Frank Schuler)
 '
 '  URL:      https://github.com/KallunWillock/ChibiPDF
 '            https://www.activevb.de
@@ -76,6 +76,7 @@ Attribute VB_Exposed = False
 '                                 32-but incompatibility; converted private Property
 '                                 to public function and removed UDT reference from
 '                                 signature.
+'            1.2    08/07/2026    Corrected RECTF UDT to Left/Top/Right/Bottom
 
 Option Explicit
 
@@ -115,7 +116,7 @@ Private Const IID_IBitmapFrame          As String = "{72A49A1C-8081-438D-91BC-94
 Private Const IID_IOcrEngineStatics     As String = "{5BFFA85A-3384-3540-9940-699120D428A8}"
 Private Const IID_IBitmapDecoderStatics As String = "{438CCB26-BCEF-4E95-BAD6-23A822E58D01}"
 Private Const IID_IBitmapFrameWithSoftwareBitmap As String = "{FE287C9A-420C-4963-87AD-691436E08383}"
-Private Const CHIBEX_VERSION            As Single = 1.1#
+Private Const CHIBEX_VERSION            As Single = 1.2
 
 Private Enum VTbl
   ' IUnknown
@@ -178,10 +179,10 @@ Private Type GUID
 End Type
 
 Private Type RECTF
-  X      As Single
-  Y      As Single
-  Width  As Single
-  Height As Single
+  Left   As Single
+  Top    As Single
+  Right  As Single
+  Bottom As Single
 End Type
 
 Private Type OcrLanguage
@@ -366,15 +367,15 @@ Public Property Get ResultLineWord(ByVal lineIndex As Long, ByVal wordIndex As L
   End With
 End Property
 
-Public Function ResultLineWordRect(ByVal lineIndex As Long, ByVal wordIndex As Long, ByRef left As Single, ByRef top As Single, ByRef right As Single, ByRef bottom As Single) As Boolean
+Public Function ResultLineWordRect(ByVal lineIndex As Long, ByVal wordIndex As Long, ByRef Left As Single, ByRef Top As Single, ByRef Right As Single, ByRef Bottom As Single) As Boolean
   If lineIndex < 0 Or lineIndex >= m_Results.LineCount Then Exit Function
   If wordIndex < 0 Or wordIndex >= m_Results.Lines(lineIndex).WordCount Then Exit Function
 
   With m_Results.Lines(lineIndex).Words(wordIndex).Rect
-    left = .Left
-    top = .Top
-    right = .Right
-    bottom = .Bottom
+    Left = .Left
+    Top = .Top
+    Right = .Right
+    Bottom = .Bottom
   End With
 
   ResultLineWordRect = True
